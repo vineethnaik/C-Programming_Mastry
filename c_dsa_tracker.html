@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>C & DSA Mastery Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060810;
+  --s1:#0d1117;
+  --s2:#161b27;
+  --s3:#1e2535;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.12);
+  --txt:#dde3f0;
+  --muted:#5a6480;
+  --muted2:#8896b3;
+  --c1:#4f8ef7;--c1g:rgba(79,142,247,0.15);
+  --c2:#a855f7;--c2g:rgba(168,85,247,0.15);
+  --c3:#22d3ee;--c3g:rgba(34,211,238,0.15);
+  --c4:#4ade80;--c4g:rgba(74,222,128,0.15);
+  --c5:#fb923c;--c5g:rgba(251,146,60,0.15);
+  --c6:#f472b6;--c6g:rgba(244,114,182,0.15);
+  --c7:#facc15;--c7g:rgba(250,204,21,0.15);
+  --c8:#34d399;--c8g:rgba(52,211,153,0.15);
+  --red:#f87171;
+  --r:10px;--rsm:7px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* CANVAS BACKGROUND */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.6}
+
+/* GRID OVERLAY */
+.grid-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(79,142,247,0.025) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(79,142,247,0.025) 1px,transparent 1px);
+  background-size:50px 50px}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:50;background:rgba(6,8,16,0.85);
+  backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0}
+
+.header-top{max-width:1280px;margin:0 auto;padding:14px 24px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand-icon{width:42px;height:42px;border-radius:10px;
+  background:linear-gradient(135deg,var(--c1),var(--c2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#fff;
+  position:relative;overflow:hidden;flex-shrink:0}
+.brand-icon::after{content:'';position:absolute;inset:-50%;
+  background:conic-gradient(transparent 0deg,rgba(255,255,255,0.3) 90deg,transparent 180deg);
+  animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.brand-text{font-size:1.15rem;font-weight:800;letter-spacing:-0.3px}
+.brand-text span{background:linear-gradient(90deg,var(--c1),var(--c3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.header-stats{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto}
+.hstat{background:var(--s2);border:1px solid var(--border);border-radius:999px;
+  padding:6px 14px;font-size:12px;font-family:'JetBrains Mono',monospace;
+  display:flex;align-items:center;gap:7px;transition:all 0.3s}
+.hstat:hover{border-color:var(--border2)}
+.hstat-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.hstat-val{font-weight:700;color:var(--txt)}
+.hstat-lbl{color:var(--muted2)}
+
+/* XP BAR */
+.xp-bar-wrap{padding:0 24px 14px;max-width:1280px;margin:0 auto}
+.xp-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.xp-level{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--c7)}
+.xp-num{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--muted2)}
+.xp-track{height:5px;background:var(--s3);border-radius:999px;overflow:visible;position:relative}
+.xp-fill{height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3));
+  transition:width 0.8s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 0 12px rgba(79,142,247,0.5);position:relative}
+.xp-fill::after{content:'';position:absolute;right:-1px;top:-3px;bottom:-3px;width:11px;
+  border-radius:50%;background:#fff;box-shadow:0 0 10px var(--c1),0 0 20px var(--c1);
+  transition:left 0.8s}
+
+/* CONTROLS */
+.controls{max-width:1280px;margin:20px auto 0;padding:0 24px;
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.search{flex:1;min-width:180px;max-width:300px;height:36px;
+  background:var(--s2);border:1px solid var(--border2);border-radius:var(--rsm);
+  padding:0 14px;color:var(--txt);font-family:'Outfit',sans-serif;font-size:13.5px;
+  outline:none;transition:all 0.2s}
+.search::placeholder{color:var(--muted)}
+.search:focus{border-color:var(--c1);box-shadow:0 0 0 3px rgba(79,142,247,0.12)}
+.fbtn{height:36px;padding:0 16px;background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--rsm);color:var(--muted2);font-family:'Outfit',sans-serif;font-size:13px;
+  font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.fbtn:hover{border-color:var(--border2);color:var(--txt)}
+.fbtn.on{background:rgba(79,142,247,0.15);border-color:rgba(79,142,247,0.4);color:var(--c1)}
+.expand-all{height:36px;padding:0 16px;background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--rsm);color:var(--muted2);font-family:'Outfit',sans-serif;font-size:13px;
+  font-weight:600;cursor:pointer;transition:all 0.2s}
+.expand-all:hover{border-color:var(--border2);color:var(--txt)}
+.rst{height:36px;padding:0 16px;background:transparent;
+  border:1px solid rgba(248,113,113,0.25);border-radius:var(--rsm);
+  color:var(--red);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;margin-left:auto}
+.rst:hover{background:rgba(248,113,113,0.08)}
+
+/* MAIN */
+main{max-width:1280px;margin:24px auto;padding:0 24px 80px;position:relative;z-index:1}
+
+/* SECTION CARD */
+.sec{margin-bottom:14px;border-radius:var(--r);overflow:hidden;
+  border:1px solid var(--border);background:var(--s1);
+  transition:border-color 0.25s,transform 0.2s;
+  animation:fadeUp 0.5s ease backwards}
+.sec:hover{border-color:var(--border2)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* TOPIC HEADER */
+.th{display:flex;align-items:center;gap:14px;padding:14px 18px;
+  cursor:pointer;user-select:none;transition:background 0.15s;position:relative}
+.th:hover{background:rgba(255,255,255,0.015)}
+
+/* Accent stripe */
+.th::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;opacity:0;transition:opacity 0.3s}
+.sec.open .th::before,.sec:hover .th::before{opacity:1}
+
+/* Topic icon */
+.ticon{width:38px;height:38px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+
+/* SVG Ring */
+.ring-wrap{position:relative;width:38px;height:38px;flex-shrink:0}
+.ring-bg{fill:none;stroke:var(--s3);stroke-width:3}
+.ring-fg{fill:none;stroke-width:3;stroke-linecap:round;
+  transform:rotate(-90deg);transform-origin:50% 50%;
+  transition:stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1)}
+
+.tinfo{flex:1;min-width:0}
+.ttitle{font-size:14.5px;font-weight:700;color:var(--txt);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tsub{font-size:11.5px;color:var(--muted2);margin-top:2px;font-weight:400}
+
+.tright{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.tcnt{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--muted2)}
+.tchev{width:16px;height:16px;color:var(--muted);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);flex-shrink:0}
+.sec.open .tchev{transform:rotate(180deg)}
+
+/* TOPIC COMPLETE BADGE */
+.done-badge{display:none;align-items:center;gap:5px;
+  background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.25);
+  border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--c4)}
+.done-badge.show{display:flex;animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(0.6)}to{opacity:1;transform:scale(1)}}
+
+/* PROBLEMS LIST */
+.plist{max-height:0;overflow:hidden;transition:max-height 0.5s cubic-bezier(0.4,0,0.2,1)}
+.sec.open .plist{max-height:9999px}
+.plist-border{border-top:1px solid var(--border)}
+.pinner{padding:10px 18px 14px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:5px}
+
+/* PROBLEM ROW */
+.prow{display:flex;align-items:flex-start;gap:10px;padding:7px 9px;
+  border-radius:var(--rsm);cursor:pointer;transition:background 0.15s;
+  position:relative}
+.prow:hover{background:rgba(255,255,255,0.03)}
+.prow.done{opacity:0.45}
+
+.cb{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--border2);
+  flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;
+  transition:all 0.25s cubic-bezier(0.4,0,0.2,1)}
+.prow.done .cb{background:var(--c4);border-color:var(--c4);
+  box-shadow:0 0 10px rgba(74,222,128,0.4)}
+.cm{opacity:0;transform:scale(0) rotate(-20deg);transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+.prow.done .cm{opacity:1;transform:scale(1) rotate(0deg)}
+
+.ptxt{font-size:13px;line-height:1.5;color:var(--txt);transition:color 0.2s}
+.prow.done .ptxt{text-decoration:line-through;color:var(--muted)}
+
+.tags{display:inline-flex;gap:4px;margin-left:5px;vertical-align:middle}
+.tag{font-size:9.5px;padding:1px 6px;border-radius:3px;
+  font-family:'JetBrains Mono',monospace;font-weight:600;letter-spacing:0.3px}
+.t-new{background:rgba(79,142,247,0.15);color:var(--c1)}
+.t-hard{background:rgba(248,113,113,0.15);color:var(--red)}
+.t-rec{background:rgba(168,85,247,0.15);color:var(--c2)}
+.t-dsa{background:rgba(34,211,238,0.15);color:var(--c3)}
+
+/* Glow on just-checked */
+@keyframes glow-check{0%{box-shadow:0 0 0 0 rgba(74,222,128,0.6)}70%{box-shadow:0 0 0 12px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+.prow.just-done .cb{animation:glow-check 0.6s ease}
+
+/* TOPIC STRIPE COLORS */
+.col-blue .th::before{background:var(--c1)}
+.col-blue .ring-fg{stroke:var(--c1)}
+.col-blue .ticon{background:var(--c1g)}
+.col-purple .th::before{background:var(--c2)}
+.col-purple .ring-fg{stroke:var(--c2)}
+.col-purple .ticon{background:var(--c2g)}
+.col-cyan .th::before{background:var(--c3)}
+.col-cyan .ring-fg{stroke:var(--c3)}
+.col-cyan .ticon{background:var(--c3g)}
+.col-green .th::before{background:var(--c4)}
+.col-green .ring-fg{stroke:var(--c4)}
+.col-green .ticon{background:var(--c4g)}
+.col-orange .th::before{background:var(--c5)}
+.col-orange .ring-fg{stroke:var(--c5)}
+.col-orange .ticon{background:var(--c5g)}
+.col-pink .th::before{background:var(--c6)}
+.col-pink .ring-fg{stroke:var(--c6)}
+.col-pink .ticon{background:var(--c6g)}
+.col-yellow .th::before{background:var(--c7)}
+.col-yellow .ring-fg{stroke:var(--c7)}
+.col-yellow .ticon{background:var(--c7g)}
+.col-teal .th::before{background:var(--c8)}
+.col-teal .ring-fg{stroke:var(--c8)}
+.col-teal .ticon{background:var(--c8g)}
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(14px);
+  background:var(--s2);border:1px solid var(--border2);border-radius:var(--rsm);
+  padding:10px 20px;font-size:13px;font-weight:600;
+  opacity:0;transition:all 0.3s;z-index:200;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* CONFETTI PARTICLE */
+.cp{position:fixed;pointer-events:none;z-index:999;border-radius:2px;
+  animation:cp-burst 0.9s ease-out forwards}
+@keyframes cp-burst{0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
+100%{opacity:0;transform:translate(var(--tx),var(--ty)) rotate(var(--tr)) scale(0.3)}}
+
+/* MILESTONE POPUP */
+#milestone{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);
+  background:var(--s2);border:1px solid var(--border2);border-radius:16px;
+  padding:32px 40px;text-align:center;z-index:300;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+#milestone.show{transform:translate(-50%,-50%) scale(1)}
+#milestone.hide{transform:translate(-50%,-50%) scale(0)}
+.ms-emoji{font-size:48px;margin-bottom:12px;display:block;animation:bounce 0.5s ease infinite alternate}
+@keyframes bounce{to{transform:translateY(-8px)}}
+.ms-title{font-size:20px;font-weight:800;margin-bottom:6px}
+.ms-sub{font-size:13px;color:var(--muted2)}
+#ms-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:299;
+  opacity:0;pointer-events:none;transition:opacity 0.3s}
+#ms-overlay.show{opacity:1;pointer-events:all}
+
+/* FLOATING PARTICLES CSS */
+.fp{position:fixed;pointer-events:none;z-index:0;border-radius:50%;animation:fpf var(--dur) ease-in-out infinite}
+@keyframes fpf{0%,100%{transform:translateY(0) translateX(0) scale(1);opacity:var(--op)}
+50%{transform:translateY(var(--dy)) translateX(var(--dx)) scale(var(--sc));opacity:calc(var(--op)*0.5)}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* EMPTY */
+.empty-msg{text-align:center;padding:3rem;color:var(--muted);font-size:14px}
+
+@media(max-width:600px){
+  .pinner{grid-template-columns:1fr}
+  .header-stats{gap:6px}
+  header{padding:0}
+  main,.controls{padding-left:14px;padding-right:14px}
+}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="grid-overlay"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-icon">&lt;/&gt;</div>
+      <div class="brand-text">C &amp; <span>DSA</span> Mastery</div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat"><span class="hstat-dot" style="background:var(--c1)"></span><span class="hstat-val" id="hs-done">0</span><span class="hstat-lbl">&nbsp;done</span></div>
+      <div class="hstat"><span class="hstat-dot" style="background:var(--muted)"></span><span class="hstat-val" id="hs-left">0</span><span class="hstat-lbl">&nbsp;left</span></div>
+      <div class="hstat"><span class="hstat-dot" style="background:var(--c4)"></span><span class="hstat-val" id="hs-pct">0%</span><span class="hstat-lbl">&nbsp;complete</span></div>
+      <div class="hstat"><span class="hstat-dot" style="background:var(--c7)"></span><span class="hstat-val" id="hs-topics">0</span><span class="hstat-lbl">&nbsp;topics</span></div>
+    </div>
+  </div>
+  <div class="xp-bar-wrap">
+    <div class="xp-meta">
+      <span class="xp-level" id="xp-level-lbl">LEVEL 1 — BEGINNER</span>
+      <span class="xp-num" id="xp-num-lbl">0 XP</span>
+    </div>
+    <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+  </div>
+</header>
+
+<div class="controls">
+  <input class="search" type="text" placeholder="🔍  Search problems..." id="srch" oninput="doSearch()"/>
+  <button class="fbtn on" onclick="setF('all',this)">All</button>
+  <button class="fbtn" onclick="setF('pending',this)">Pending</button>
+  <button class="fbtn" onclick="setF('done',this)">Done</button>
+  <button class="expand-all" onclick="toggleAll()">Expand All</button>
+  <button class="rst" onclick="doReset()">Reset</button>
+</div>
+
+<main id="main"></main>
+
+<div id="toast"></div>
+<div id="ms-overlay" onclick="closeMilestone()"></div>
+<div id="milestone">
+  <span class="ms-emoji" id="ms-emoji">🎉</span>
+  <div class="ms-title" id="ms-title">Topic Complete!</div>
+  <div class="ms-sub" id="ms-sub">Keep going!</div>
+  <button onclick="closeMilestone()" style="margin-top:18px;padding:9px 28px;border-radius:999px;background:var(--c1);border:none;color:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;cursor:pointer">Awesome!</button>
+</div>
+
+<script>
+/* ---- DATA ---- */
+const TOPICS=[
+{id:'c_basics',title:'C Basics & Program Structure',col:'col-blue',icon:'🔧',sub:'Header files, main(), compilation, I/O',
+problems:[
+{id:'cb1',x:'Program structure: write Hello World with proper headers/main/return'},
+{id:'cb2',x:'Read and print integer, float, char, string using scanf/printf'},
+{id:'cb3',x:'Demonstrate all format specifiers (%d %f %c %s %o %x %e)'},
+{id:'cb4',x:'Swap two numbers without a third variable'},
+{id:'cb5',x:'Compute simple interest given P, R, T'},
+{id:'cb6',x:'Compute area and perimeter of circle, rectangle, triangle'},
+{id:'cb7',x:'Convert Celsius to Fahrenheit and vice versa'},
+{id:'cb8',x:'Find area of triangle using Heron\'s formula'},
+{id:'cb9',x:'Perform division of two numbers (handle divide by zero)'},
+{id:'cb10',x:'Print a random number and a random number in given range'},
+]},
+{id:'datatypes',title:'Datatypes, Operators & Type Casting',col:'col-teal',icon:'⚙️',sub:'Arithmetic, logical, relational, bitwise, conditional',
+problems:[
+{id:'dt1',x:'Demonstrate all arithmetic operators (+, -, *, /, %)'},
+{id:'dt2',x:'Demonstrate all relational operators and print results'},
+{id:'dt3',x:'Demonstrate logical operators (&&, ||, !) with truth tables'},
+{id:'dt4',x:'Demonstrate increment/decrement (pre/post) with examples'},
+{id:'dt5',x:'Demonstrate ternary/conditional operator (? :)'},
+{id:'dt6',x:'Explicit type casting: int→float, float→int, char→int'},
+{id:'dt7',x:'Size of all data types using sizeof() operator'},
+{id:'dt8',x:'Overflow and underflow demonstration with int and char'},
+{id:'dt9',x:'Compute all bitwise operations on two numbers: AND OR XOR NOT'},
+{id:'dt10',x:'Left shift (<<) and right shift (>>) by k positions and observe'},
+]},
+{id:'conditionals',title:'Conditional Statements',col:'col-amber',icon:'🔀',sub:'if, if-else, else-if ladder, switch-case',
+problems:[
+{id:'co1',x:'Check if number is even or odd using if-else'},
+{id:'co2',x:'Find largest of two numbers'},
+{id:'co3',x:'Find smallest of three numbers'},
+{id:'co4',x:'Grade calculator (A/B/C/D/F) using if-else-if ladder'},
+{id:'co5',x:'Check vowel or consonant using switch-case'},
+{id:'co6',x:'Simple calculator (+,-,*,/) using switch-case'},
+{id:'co7',x:'Check leap year using conditional logic'},
+{id:'co8',x:'Check positive, negative, or zero'},
+{id:'co9',x:'Find largest of three using nested ternary'},
+{id:'co10',x:'Check even/odd WITHOUT if-else (using bitwise or ternary)'},
+{id:'co11',x:'Check even/odd WITHOUT % operator (bitwise AND)'},
+{id:'co12',x:'Day name from number (1–7) using switch-case'},
+]},
+{id:'loops',title:'Loops & Iteration',col:'col-green',icon:'🔁',sub:'for, while, do-while, nested, break/continue/goto',
+problems:[
+{id:'lo1',x:'Print 1 to N using for, while, and do-while loop (all three)'},
+{id:'lo2',x:'Print multiplication table of given number'},
+{id:'lo3',x:'Find sum of even numbers in user-given range'},
+{id:'lo4',x:'Sum of digits of a number using loop'},
+{id:'lo5',x:'Reverse of a given number using loop'},
+{id:'lo6',x:'Find factorial using loop'},
+{id:'lo7',x:'Print Fibonacci series using loop'},
+{id:'lo8',x:'Check if number is perfect number using loop'},
+{id:'lo9',x:'Print star pyramid patterns (3 types) using nested loops'},
+{id:'lo10',x:'Number triangle using nested for loops'},
+{id:'lo11',x:'Floyd\'s triangle pattern'},
+{id:'lo12',x:'Print primes in range using for loop'},
+{id:'lo13',x:'Demonstrate break, continue, and goto with examples'},
+{id:'lo14',x:'Find sum of numbers in range using do-while with input validation'},
+]},
+{id:'numbers',title:'Number Theory & Special Numbers',col:'col-cyan',icon:'🔢',sub:'Prime, palindrome, Armstrong, GCD, LCM',
+problems:[
+{id:'nm1',x:'Check number is Power of 2 (bitwise trick)'},
+{id:'nm2',x:'Check given number is prime or not'},
+{id:'nm3',x:'Print all primes in user-given range'},
+{id:'nm4',x:'Count primes in range'},
+{id:'nm5',x:'Find max prime and min prime in range; print their difference'},
+{id:'nm6',x:'Find sum of prime digits in a given number'},
+{id:'nm7',x:'Check palindrome number (without string conversion)'},
+{id:'nm8',x:'Print palindromes in range'},
+{id:'nm9',x:'Check palindromic prime (e.g. 11,101,131,151)'},
+{id:'nm10',x:'Print palindromic primes in range'},
+{id:'nm11',x:'Check Armstrong number (e.g. 153 = 1³+5³+3³)'},
+{id:'nm12',x:'Print Armstrong numbers in range'},
+{id:'nm13',x:'Count Armstrong numbers in range'},
+{id:'nm14',x:'Find GCD of two numbers (Euclidean algorithm)'},
+{id:'nm15',x:'Find LCM of two numbers using GCD formula'},
+{id:'nm16',x:'Check perfect number (sum of factors equals number)'},
+{id:'nm17',x:'Check automorphic number (25² = 625, ends in 25)'},
+{id:'nm18',x:'Find sum of all prime digits in number'},
+{id:'nm19',x:'Find reverse of number; check if palindrome'},
+{id:'nm20',x:'Print Fibonacci series; find nth Fibonacci term'},
+]},
+{id:'functions',title:'Functions',col:'col-purple',icon:'📦',sub:'Declaration, scope, call by value/reference',
+problems:[
+{id:'fn1',x:'Function to check even/odd; function to check prime'},
+{id:'fn2',x:'Function to compute factorial (iterative)'},
+{id:'fn3',x:'Function to find GCD; function to find LCM'},
+{id:'fn4',x:'Function to print Fibonacci up to N'},
+{id:'fn5',x:'Function returning multiple values via pointer parameters'},
+{id:'fn6',x:'Demonstrate call by value: swap that does NOT work'},
+{id:'fn7',x:'Demonstrate call by reference: swap THAT works (pointers)'},
+{id:'fn8',x:'Recursive function vs iterative: factorial both ways'},
+{id:'fn9',x:'Write function with variable-length argument concept demo'},
+{id:'fn10',x:'Nested function calls: f(g(x)) composition example'},
+{id:'fn11',x:'Static variable inside function: count function calls'},
+{id:'fn12',x:'Function to find largest of N numbers passed as array'},
+]},
+{id:'recursion',title:'Recursion & Backtracking',col:'col-pink',icon:'🌀',sub:'Base case, recursive case, stack memory, backtracking',
+problems:[
+{id:'rc1',x:'Factorial using recursive function'},
+{id:'rc2',x:'Fibonacci series using recursion'},
+{id:'rc3',x:'Sum of digits using recursion'},
+{id:'rc4',x:'Power: compute a^b using recursion'},
+{id:'rc5',x:'GCD of two numbers using recursion (Euclid)'},
+{id:'rc6',x:'Check palindrome number using recursion'},
+{id:'rc7',x:'Sum of numbers in a range [a,b] using recursion'},
+{id:'rc8',x:'Print digits of number in reverse using recursion'},
+{id:'rc9',x:'Count digits in a number using recursion'},
+{id:'rc10',x:'Binary search implemented recursively'},
+{id:'rc11',x:'Tower of Hanoi: print all moves for N disks',t:'hard'},
+{id:'rc12',x:'Print all subsets / power set of array (backtracking)',t:'hard'},
+{id:'rc13',x:'Generate all permutations of a string (backtracking)',t:'hard'},
+{id:'rc14',x:'Merge sort using recursion'},
+{id:'rc15',x:'Quick sort using recursion'},
+]},
+{id:'arrays1d',title:'Arrays — 1D Operations',col:'col-orange',icon:'📊',sub:'CRUD, math ops, primes, sets, majority',
+problems:[
+{id:'ar1',x:'Print all primes in an array'},
+{id:'ar2',x:'Find sum of primes in array'},
+{id:'ar3',x:'Count primes in array'},
+{id:'ar4',x:'Find sum of even numbers in array'},
+{id:'ar5',x:'Find smallest prime in array'},
+{id:'ar6',x:'Find largest even in array'},
+{id:'ar7',x:'Find smallest odd in array (problem 33/34 original)'},
+{id:'ar8',x:'Find kth smallest even number in array'},
+{id:'ar9',x:'Find kth largest prime in array'},
+{id:'ar10',x:'Check if array has all primes between min_prime and max_prime'},
+{id:'ar11',x:'Find union of two arrays'},
+{id:'ar12',x:'Find intersection of two arrays'},
+{id:'ar13',x:'Find set difference of two arrays (A - B)'},
+{id:'ar14',x:'Find and count duplicate elements'},
+{id:'ar15',x:'Find and count unique elements'},
+{id:'ar16',x:'Find the element repeated the most times (majority element)'},
+{id:'ar17',x:'Find difference between smallest and largest elements'},
+{id:'ar18',x:'Check if array is a palindrome array'},
+{id:'ar19',x:'Check if every element in array is itself a palindrome'},
+{id:'ar20',x:'Print only unique elements in array'},
+{id:'ar21',x:'Segregate even and odd numbers'},
+{id:'ar22',x:'Segregate positive and negative numbers'},
+{id:'ar23',x:'Segregate non-zero and zero elements'},
+{id:'ar24',x:'Find smallest digit from the largest number in array'},
+{id:'ar25',x:'Find largest digit from the smallest number in array'},
+]},
+{id:'arr_algo',title:'Array Algorithms & Techniques',col:'col-yellow',icon:'⚡',sub:'Two pointer, sliding window, Kadane, prefix sum',
+problems:[
+{id:'aa1',x:'Find second maximum element in array'},
+{id:'aa2',x:'Find second minimum element in array'},
+{id:'aa3',x:'Frequency count of each element in array'},
+{id:'aa4',x:'Delete all duplicate elements from unsorted array'},
+{id:'aa5',x:'Find first repeating element in array'},
+{id:'aa6',x:'Find first non-repeating element in array'},
+{id:'aa7',x:'Rotate array K times to the RIGHT'},
+{id:'aa8',x:'Rotate array K times to the LEFT'},
+{id:'aa9',x:'Find minimum difference between any two elements'},
+{id:'aa10',x:'Find the pair with given sum (two pointer technique)',t:'dsa'},
+{id:'aa11',x:'Move all zeros to end of array (maintain order)',t:'dsa'},
+{id:'aa12',x:'Maximum subarray sum — Kadane\'s algorithm',t:'hard'},
+{id:'aa13',x:'Subarray with given sum — sliding window technique',t:'hard'},
+{id:'aa14',x:'Subarray with XOR equal to k',t:'hard'},
+{id:'aa15',x:'Check if left sum equals right sum excluding index i'},
+{id:'aa16',x:'Product of array except self (no division allowed)',t:'hard'},
+{id:'aa17',x:'Maximum profit in single stock buy-sell transaction'},
+{id:'aa18',x:'Minimum jumps to reach end of array',t:'hard'},
+{id:'aa19',x:'Three sum: find triplet with given sum (two pointer)',t:'hard'},
+{id:'aa20',x:'Find missing number in array of 1 to N (XOR trick)'},
+]},
+{id:'arr_2d',title:'2D Arrays & Matrix Operations',col:'col-teal',icon:'🔲',sub:'Traversal, transpose, spiral, operations',
+problems:[
+{id:'mx1',x:'Read and display a 2D matrix'},
+{id:'mx2',x:'Find sum of all elements of a matrix'},
+{id:'mx3',x:'Find row-wise and column-wise sum'},
+{id:'mx4',x:'Find sum of diagonal elements (primary + secondary)'},
+{id:'mx5',x:'Print upper triangular matrix'},
+{id:'mx6',x:'Print lower triangular matrix'},
+{id:'mx7',x:'Find transpose of a matrix'},
+{id:'mx8',x:'Multiply two matrices (check compatibility)',t:'hard'},
+{id:'mx9',x:'Print matrix in SPIRAL order',t:'hard'},
+{id:'mx10',x:'Check if matrix is symmetric (M == M^T)'},
+{id:'mx11',x:'Search element in row-wise and column-wise sorted matrix',t:'hard'},
+{id:'mx12',x:'Rotate matrix 90 degrees clockwise',t:'hard'},
+]},
+{id:'searching',title:'Searching Algorithms',col:'col-blue',icon:'🔍',sub:'Linear search, Binary search, complexity analysis',
+problems:[
+{id:'se1',x:'Linear search: find element, return index'},
+{id:'se2',x:'Linear search: count all occurrences of target'},
+{id:'se3',x:'Linear search: find first AND last occurrence'},
+{id:'se4',x:'Binary search on sorted array — iterative'},
+{id:'se5',x:'Binary search on sorted array — recursive'},
+{id:'se6',x:'Binary search: find floor and ceiling of target',t:'dsa'},
+{id:'se7',x:'Binary search: count occurrences (lower+upper bound)',t:'dsa'},
+{id:'se8',x:'Find peak element using binary search',t:'hard'},
+{id:'se9',x:'Search in rotated sorted array',t:'hard'},
+{id:'se10',x:'Compare time complexity of linear vs binary (large N analysis)'},
+]},
+{id:'sorting',title:'Sorting Algorithms',col:'col-green',icon:'📈',sub:'Bubble, Selection, Insertion, Merge, Quick',
+problems:[
+{id:'so1',x:'Bubble sort: implement and trace each pass'},
+{id:'so2',x:'Bubble sort: optimized (stop if no swap in a pass)'},
+{id:'so3',x:'Selection sort: implement and count comparisons'},
+{id:'so4',x:'Insertion sort: implement and trace insertions'},
+{id:'so5',x:'Merge sort using recursion (divide and conquer)',t:'dsa'},
+{id:'so6',x:'Quick sort using partition + recursion',t:'dsa'},
+{id:'so7',x:'Sort array elements by using merge sort technique (original)'},
+{id:'so8',x:'Sort array elements by using Quick Sort technique (original)'},
+{id:'so9',x:'Sort strings lexicographically using bubble sort'},
+{id:'so10',x:'Count swaps performed by bubble sort on given array'},
+{id:'so11',x:'Sort array of structures by a specific field'},
+{id:'so12',x:'Arrange characters in ascending order by ASCII value (original)'},
+]},
+{id:'strings',title:'Strings & String Algorithms',col:'col-pink',icon:'💬',sub:'Manual ops, patterns, anagram, cipher, palindrome',
+problems:[
+{id:'st1',x:'Check palindrome string without built-in functions'},
+{id:'st2',x:'Count digits, consonants, vowels, spaces, special chars'},
+{id:'st3',x:'Find sum of digits in string; find sum of numbers in string'},
+{id:'st4',x:'Find largest digit and smallest digit in string'},
+{id:'st5',x:'Find largest number and smallest number in string'},
+{id:'st6',x:'Check valid password (upper+lower+digit+special, length≥8)'},
+{id:'st7',x:'Check string contains only alphabets'},
+{id:'st8',x:'Check valid phone number (10 digits, starts with 6-9)'},
+{id:'st9',x:'Count lowercase letters in string'},
+{id:'st10',x:'doubleCharacter string: "abc" → "aabbcc"'},
+{id:'st11',x:'Check if "XYZ" is exactly in the MIDDLE of string'},
+{id:'st12',x:'Find largest digit in the largest number in string'},
+{id:'st13',x:'Count unique characters in string'},
+{id:'st14',x:'Find most repeated character in string'},
+{id:'st15',x:'Find most repeated digit in string'},
+{id:'st16',x:'Find most repeated special character in string'},
+{id:'st17',x:'Find and print all duplicate characters'},
+{id:'st18',x:'Print unique special characters from string'},
+{id:'st19',x:'Print ALL possible substrings of given string'},
+{id:'st20',x:'Longest substring with all unique characters (sliding window)',t:'hard'},
+{id:'st21',x:'Longest palindromic substring',t:'hard'},
+{id:'st22',x:'Arrange characters by ASCII value (original)'},
+{id:'st23',x:'Reverse individual words in a sentence'},
+{id:'st24',x:'Check if two strings are anagrams'},
+{id:'st25',x:'Check if one string is rotation of another'},
+{id:'st26',x:'Caesar cipher: encrypt a string'},
+{id:'st27',x:'Caesar cipher: decrypt an encrypted string'},
+{id:'st28',x:'Wildcard pattern matching with ? and *',t:'hard'},
+{id:'st29',x:'Valid parentheses check using stack concept',t:'dsa'},
+{id:'st30',x:'Frequency map of characters using array[256]'},
+]},
+{id:'pointers',title:'Pointers',col:'col-orange',icon:'📌',sub:'Basics, arithmetic, arrays, dynamic memory',
+problems:[
+{id:'pt1',x:'Declare pointer, assign address, dereference, print address'},
+{id:'pt2',x:'Pointer arithmetic: increment, decrement, difference between pointers'},
+{id:'pt3',x:'Swap two numbers using pointer parameters'},
+{id:'pt4',x:'Access array elements using pointer notation (arr[i] vs *(arr+i))'},
+{id:'pt5',x:'Pass array to function using pointer; modify inside function'},
+{id:'pt6',x:'Return pointer from a function (static array)'},
+{id:'pt7',x:'Pointer to pointer (double pointer) — declare, assign, dereference',t:'hard'},
+{id:'pt8',x:'Dynamic allocation with malloc(): create int array at runtime',t:'hard'},
+{id:'pt9',x:'Dynamic allocation with calloc() and realloc()',t:'hard'},
+{id:'pt10',x:'Free memory and avoid memory leaks (free() demo)'},
+{id:'pt11',x:'String traversal using character pointer (without index)'},
+{id:'pt12',x:'Array of pointers to strings: store and print multiple strings'},
+{id:'pt13',x:'Function pointer: declare, assign, call via pointer',t:'hard'},
+{id:'pt14',x:'Void pointer: generic pointer usage and casting',t:'hard'},
+]},
+{id:'structures',title:'Structures & Unions',col:'col-teal',icon:'🏗️',sub:'struct, nested, array of structs, union',
+problems:[
+{id:'str1',x:'Define Student struct; read and print N student records'},
+{id:'str2',x:'Array of structures: store and display records'},
+{id:'str3',x:'Nested structure: Address inside Employee struct'},
+{id:'str4',x:'Pass structure to function by value'},
+{id:'str5',x:'Pass structure to function by pointer reference'},
+{id:'str6',x:'Return structure from function'},
+{id:'str7',x:'Sort array of structures by age using bubble sort'},
+{id:'str8',x:'Find student with highest marks using struct array'},
+{id:'str9',x:'Union: same memory for different types, check memory size'},
+{id:'str10',x:'Typedef with struct for clean type aliases'},
+{id:'str11',x:'Self-referential struct: implement linked list node'},
+{id:'str12',x:'Bit fields inside struct for compact memory storage'},
+]},
+{id:'bitmask',title:'Bit Manipulation',col:'col-blue',icon:'🧮',sub:'Masks, shifts, tricks, applications',
+problems:[
+{id:'bm1',x:'Check if number is power of 2 using (n & n-1) == 0'},
+{id:'bm2',x:'Check even/odd using bitwise AND (n & 1)'},
+{id:'bm3',x:'Check even/odd without % operator (n & 1 trick)'},
+{id:'bm4',x:'Count number of set bits (Brian Kernighan\'s algorithm)',t:'dsa'},
+{id:'bm5',x:'Set the Nth bit of a number (num | (1 << n))'},
+{id:'bm6',x:'Clear the Nth bit of a number (num & ~(1 << n))'},
+{id:'bm7',x:'Toggle the Nth bit (num ^ (1 << n))'},
+{id:'bm8',x:'Swap two numbers using XOR (no temp variable)'},
+{id:'bm9',x:'Find the only non-repeating element in array using XOR',t:'hard'},
+{id:'bm10',x:'Find two non-repeating elements in array using XOR',t:'hard'},
+{id:'bm11',x:'Check if two integers have opposite signs using XOR'},
+{id:'bm12',x:'Find XOR of all numbers from 1 to N (pattern trick)',t:'dsa'},
+{id:'bm13',x:'Reverse bits of a 32-bit unsigned integer',t:'hard'},
+{id:'bm14',x:'Find position of rightmost set bit'},
+]},
+{id:'stack',title:'Stack (Array & Linked List)',col:'col-purple',icon:'📚',sub:'Push/pop/peek, expressions, applications',
+problems:[
+{id:'sk1',x:'Stack using array: push, pop, peek, isFull, isEmpty, display'},
+{id:'sk2',x:'Handle stack overflow and underflow with proper messages'},
+{id:'sk3',x:'Stack using singly linked list (dynamic size)'},
+{id:'sk4',x:'Reverse a string using stack'},
+{id:'sk5',x:'Check balanced parentheses using stack',t:'dsa'},
+{id:'sk6',x:'Convert infix expression to postfix notation',t:'hard'},
+{id:'sk7',x:'Convert infix expression to prefix notation',t:'hard'},
+{id:'sk8',x:'Evaluate a postfix expression using stack',t:'hard'},
+{id:'sk9',x:'Evaluate a prefix expression using stack',t:'hard'},
+{id:'sk10',x:'Sort a stack using recursion (no extra data structure)',t:'hard'},
+{id:'sk11',x:'Find next greater element for each array element using stack',t:'dsa'},
+{id:'sk12',x:'Largest rectangle in histogram using stack',t:'hard'},
+]},
+{id:'queue',title:'Queue (Linear, Circular, Deque)',col:'col-green',icon:'🚦',sub:'Enqueue/dequeue, circular, priority queue',
+problems:[
+{id:'qu1',x:'Linear queue using array: enqueue, dequeue, display, isEmpty'},
+{id:'qu2',x:'Handle queue overflow and underflow conditions'},
+{id:'qu3',x:'Circular queue implementation (wrap-around with modulo)'},
+{id:'qu4',x:'Queue using singly linked list (dynamic)'},
+{id:'qu5',x:'Double-ended queue (Deque): insertFront, insertRear, deleteFront, deleteRear'},
+{id:'qu6',x:'Queue using two stacks',t:'hard'},
+{id:'qu7',x:'Stack using two queues',t:'hard'},
+{id:'qu8',x:'Reverse first K elements of queue using stack'},
+{id:'qu9',x:'BFS traversal of graph uses queue — implement BFS',t:'dsa'},
+{id:'qu10',x:'Priority queue: implement using sorted array'},
+]},
+{id:'linkedlist',title:'Linked Lists (SLL, DLL, CLL)',col:'col-cyan',icon:'🔗',sub:'Insert, delete, search, reverse, detect cycle',
+problems:[
+{id:'ll1',x:'Singly LL: insert at beginning, end, and given position'},
+{id:'ll2',x:'Singly LL: delete from beginning, end, and given position'},
+{id:'ll3',x:'Singly LL: display all nodes; count nodes; search element'},
+{id:'ll4',x:'Singly LL: reverse a linked list (iterative)',t:'dsa'},
+{id:'ll5',x:'Singly LL: reverse using recursion'},
+{id:'ll6',x:'Singly LL: find Nth node from the end'},
+{id:'ll7',x:'Singly LL: detect cycle using Floyd\'s two-pointer algorithm',t:'hard'},
+{id:'ll8',x:'Singly LL: find starting node of cycle',t:'hard'},
+{id:'ll9',x:'Singly LL: merge two sorted linked lists',t:'hard'},
+{id:'ll10',x:'Singly LL: remove duplicates from sorted linked list'},
+{id:'ll11',x:'Doubly LL: insert/delete at beginning and end'},
+{id:'ll12',x:'Doubly LL: traverse forward and backward'},
+{id:'ll13',x:'Circular LL: insert, delete, display (maintain tail pointer)'},
+{id:'ll14',x:'Singly LL: check if linked list is palindrome',t:'hard'},
+{id:'ll15',x:'Singly LL: sort using bubble sort logic on nodes'},
+]},
+{id:'trees',title:'Trees & Binary Search Tree',col:'col-orange',icon:'🌳',sub:'BST, traversals, height, level order',
+problems:[
+{id:'tr1',x:'BST: insert a node (maintain BST property)'},
+{id:'tr2',x:'BST: search for a value; return found/not found'},
+{id:'tr3',x:'BST: delete a node — all three cases (leaf, one child, two children)',t:'hard'},
+{id:'tr4',x:'BST: in-order traversal (left → root → right) — gives sorted output'},
+{id:'tr5',x:'BST: pre-order traversal (root → left → right)'},
+{id:'tr6',x:'BST: post-order traversal (left → right → root)'},
+{id:'tr7',x:'BST: level-order (BFS) traversal using queue',t:'dsa'},
+{id:'tr8',x:'Binary Tree: find height/depth of tree',t:'hard'},
+{id:'tr9',x:'BST: find minimum and maximum element'},
+{id:'tr10',x:'BST: count total number of nodes'},
+{id:'tr11',x:'BST: count leaf nodes'},
+{id:'tr12',x:'Binary Tree: check if tree is height-balanced',t:'hard'},
+{id:'tr13',x:'BST: find in-order successor and predecessor',t:'hard'},
+{id:'tr14',x:'Binary Tree: mirror/invert the tree',t:'dsa'},
+{id:'tr15',x:'BST: print all nodes at a given level (level-order)',t:'dsa'},
+]},
+{id:'graphs',title:'Graphs — BFS & DFS',col:'col-purple',icon:'🕸️',sub:'Representation, traversal, paths, cycle detection',
+problems:[
+{id:'gr1',x:'Graph representation: adjacency matrix'},
+{id:'gr2',x:'Graph representation: adjacency list'},
+{id:'gr3',x:'BFS traversal from given source vertex',t:'dsa'},
+{id:'gr4',x:'DFS traversal from given source vertex (recursive)',t:'dsa'},
+{id:'gr5',x:'DFS traversal using explicit stack (iterative)'},
+{id:'gr6',x:'Count number of connected components in undirected graph'},
+{id:'gr7',x:'Detect cycle in undirected graph using DFS',t:'hard'},
+{id:'gr8',x:'Detect cycle in directed graph using DFS',t:'hard'},
+{id:'gr9',x:'Find shortest path in unweighted graph using BFS'},
+{id:'gr10',x:'Topological sort using DFS (for DAG)',t:'hard'},
+]},
+{id:'hashing',title:'Hashing & Hash Maps',col:'col-yellow',icon:'#️⃣',sub:'Hash tables, collision, frequency counting',
+problems:[
+{id:'hs1',x:'Frequency of each character using hash array (size 256)'},
+{id:'hs2',x:'Find first non-repeating character using hash map concept'},
+{id:'hs3',x:'Check if two strings are anagrams using hash array'},
+{id:'hs4',x:'Find the most frequent element in array using hash'},
+{id:'hs5',x:'Implement hash table with chaining (linked list per bucket)',t:'hard'},
+{id:'hs6',x:'Count distinct elements in array using hashing'},
+{id:'hs7',x:'Two sum: find pair with target sum using hash map',t:'dsa'},
+{id:'hs8',x:'Longest consecutive sequence in array using hashing',t:'hard'},
+]},
+{id:'dp',title:'Dynamic Programming (Intro)',col:'col-teal',icon:'🧩',sub:'Memoization, tabulation, classic DP problems',
+problems:[
+{id:'dp1',x:'Fibonacci using memoization (top-down DP)',t:'dsa'},
+{id:'dp2',x:'Fibonacci using tabulation (bottom-up DP)',t:'dsa'},
+{id:'dp3',x:'Coin change: minimum coins for given amount',t:'hard'},
+{id:'dp4',x:'Longest Common Subsequence (LCS) of two strings',t:'hard'},
+{id:'dp5',x:'0/1 Knapsack problem',t:'hard'},
+{id:'dp6',x:'Maximum sum subarray using DP (verify Kadane\'s)',t:'dsa'},
+{id:'dp7',x:'Count ways to climb N stairs (1 or 2 steps at a time)',t:'dsa'},
+{id:'dp8',x:'Minimum path sum in matrix (grid DP)',t:'hard'},
+]},
+{id:'greedy',title:'Greedy Algorithms',col:'col-pink',icon:'💡',sub:'Activity selection, fractional knapsack, greedy choice',
+problems:[
+{id:'gy1',x:'Activity selection problem (maximize non-overlapping activities)',t:'dsa'},
+{id:'gy2',x:'Fractional knapsack: maximize value with weight limit',t:'dsa'},
+{id:'gy3',x:'Job scheduling to maximize profit (sort by deadline)',t:'hard'},
+{id:'gy4',x:'Minimum number of coins for given amount (greedy)'},
+{id:'gy5',x:'Huffman encoding concept: build frequency table',t:'hard'},
+{id:'gy6',x:'Find minimum spanning tree concept (Prim\'s or Kruskal\'s idea)',t:'hard'},
+]}
+];
+
+/* ---- STATE ---- */
+let ST={}, filter='all', srch='', allOpen=false;
+function load(){try{ST=JSON.parse(localStorage.getItem('cdsav3')||'{}')}catch(e){ST={}}}
+function save(){localStorage.setItem('cdsav3',JSON.stringify(ST))}
+
+/* ---- TOTALS ---- */
+function totals(){
+  let t=0,d=0;
+  TOPICS.forEach(tp=>{tp.problems.forEach(p=>{t++;if(ST[p.id])d++;})});
+  return{t,d};
+}
+function topicTotals(tp){
+  const t=tp.problems.length,d=tp.problems.filter(p=>ST[p.id]).length;
+  return{t,d};
+}
+
+/* ---- XP / LEVEL ---- */
+const LEVELS=[
+  {xp:0,name:'Beginner'},{xp:50,name:'Learner'},{xp:150,name:'Practitioner'},
+  {xp:300,name:'Developer'},{xp:500,name:'Problem Solver'},{xp:700,name:'Coder'},
+  {xp:900,name:'DSA Enthusiast'},{xp:1100,name:'Algorithm Thinker'},
+  {xp:1300,name:'Data Structurist'},{xp:1500,name:'Advanced Coder'},
+  {xp:1700,name:'Expert'},{xp:1900,name:'Master Coder'},
+  {xp:2100,name:'DSA Master'},{xp:9999,name:'C & DSA LEGEND'}
+];
+function updateXP(){
+  const{t,d}=totals();
+  const xp=d*10;
+  let lv=0;
+  for(let i=0;i<LEVELS.length-1;i++){if(xp>=LEVELS[i].xp&&xp<LEVELS[i+1].xp){lv=i;break;}
+    if(xp>=LEVELS[LEVELS.length-1].xp){lv=LEVELS.length-1;}}
+  const cur=LEVELS[lv].xp, nxt=LEVELS[Math.min(lv+1,LEVELS.length-1)].xp;
+  const pct=lv===LEVELS.length-1?100:Math.round((xp-cur)/(nxt-cur)*100);
+  animNum('xp-fill-w',pct,'%');
+  document.getElementById('xp-fill').style.width=pct+'%';
+  document.getElementById('xp-level-lbl').textContent=`LEVEL ${lv+1} — ${LEVELS[lv].name.toUpperCase()}`;
+  document.getElementById('xp-num-lbl').textContent=`${xp} XP`;
+}
+
+/* ---- ANIMATED COUNTER ---- */
+let counters={};
+function animNum(id,target,sfx=''){
+  const el=document.getElementById(id);
+  if(!el)return;
+  cancelAnimationFrame(counters[id]);
+  const start=parseFloat(el.dataset.val||0);
+  el.dataset.val=target;
+  const dur=600,s=performance.now();
+  function step(now){
+    const p=Math.min((now-s)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    const val=Math.round(start+(target-start)*ease);
+    el.textContent=val+sfx;
+    if(p<1)counters[id]=requestAnimationFrame(step);
+  }
+  counters[id]=requestAnimationFrame(step);
+}
+
+function updateGlobal(){
+  const{t,d}=totals();
+  const pct=t?Math.round(d/t*100):0;
+  animNum('hs-done',d); animNum('hs-left',t-d);
+  animNum('hs-pct',pct,'%');
+  document.getElementById('hs-topics').textContent=TOPICS.length;
+  updateXP();
+}
+
+/* ---- RING ---- */
+function setRing(id,pct){
+  const fg=document.getElementById('rfg-'+id);
+  if(!fg)return;
+  const r=16,circ=2*Math.PI*r;
+  fg.style.strokeDasharray=circ;
+  fg.style.strokeDashoffset=circ*(1-pct/100);
+}
+
+function updateTopicUI(tp){
+  const{t,d}=topicTotals(tp);
+  const pct=t?Math.round(d/t*100):0;
+  setRing(tp.id,pct);
+  const cnt=document.getElementById('tcnt-'+tp.id);
+  if(cnt)cnt.textContent=`${d}/${t}`;
+  const badge=document.getElementById('badge-'+tp.id);
+  if(badge)badge.classList.toggle('show',d===t&&t>0);
+}
+
+/* ---- TOGGLE PROBLEM ---- */
+function togProb(pid,tpid,el){
+  ST[pid]=!ST[pid];save();
+  el.classList.toggle('done',!!ST[pid]);
+  if(ST[pid]){
+    el.classList.add('just-done');
+    setTimeout(()=>el.classList.remove('just-done'),700);
+    burst(el);
+    const tp=TOPICS.find(t=>t.id===tpid);
+    const{t,d}=topicTotals(tp);
+    if(d===t) setTimeout(()=>showMilestone(tp),400);
+  }
+  updateTopicUI(TOPICS.find(t=>t.id===tpid));
+  updateGlobal();
+}
+
+/* ---- CONFETTI BURST ---- */
+const COLS=['#4f8ef7','#a855f7','#22d3ee','#4ade80','#fb923c','#f472b6','#facc15','#f87171'];
+function burst(el){
+  const r=el.getBoundingClientRect();
+  const cx=r.left+r.width/2, cy=r.top+r.height/2;
+  for(let i=0;i<12;i++){
+    const d=document.createElement('div');
+    d.className='cp';
+    const ang=(i/12)*360*Math.PI/180;
+    const dist=40+Math.random()*30;
+    const tx=Math.cos(ang)*dist+'px', ty=(Math.sin(ang)*dist-20)+'px';
+    const tr=(Math.random()*360)+'deg';
+    d.style.cssText=`left:${cx}px;top:${cy}px;width:${5+Math.random()*5}px;height:${5+Math.random()*5}px;background:${COLS[i%COLS.length]};--tx:${tx};--ty:${ty};--tr:${tr};border-radius:${Math.random()>0.5?'50%':'2px'}`;
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),1000);
+  }
+}
+
+/* ---- MILESTONE ---- */
+function showMilestone(tp){
+  const mils=[{emoji:'🎯',t:'Topic Complete!',s:`You've mastered all ${tp.problems.length} problems in "${tp.title}"!`},
+  {emoji:'🚀',t:'Nailed It!',s:`"${tp.title}" — 100% done! 🔥`},
+  {emoji:'⚡',t:'Excellent Work!',s:`All ${tp.problems.length} problems in "${tp.title}" crushed!`}];
+  const m=mils[Math.floor(Math.random()*mils.length)];
+  document.getElementById('ms-emoji').textContent=m.emoji;
+  document.getElementById('ms-title').textContent=m.t;
+  document.getElementById('ms-sub').textContent=m.s;
+  document.getElementById('milestone').classList.add('show');
+  document.getElementById('ms-overlay').classList.add('show');
+  /* Big burst */
+  for(let i=0;i<3;i++) setTimeout(()=>{
+    for(let j=0;j<20;j++){
+      const d=document.createElement('div');d.className='cp';
+      const cx=window.innerWidth/2, cy=window.innerHeight/2;
+      const ang=Math.random()*360*Math.PI/180,dist=80+Math.random()*100;
+      d.style.cssText=`left:${cx}px;top:${cy}px;width:8px;height:8px;background:${COLS[j%COLS.length]};--tx:${Math.cos(ang)*dist}px;--ty:${Math.sin(ang)*dist-40}px;--tr:${Math.random()*720}deg;border-radius:${Math.random()>0.5?'50%':'2px'};animation-duration:1.2s`;
+      document.body.appendChild(d);setTimeout(()=>d.remove(),1300);
+    }
+  },i*200);
+}
+function closeMilestone(){
+  document.getElementById('milestone').classList.remove('show');
+  document.getElementById('ms-overlay').classList.remove('show');
+}
+
+/* ---- TOGGLE TOPIC ---- */
+function togTopic(id){document.querySelector(`[data-tp="${id}"]`).classList.toggle('open')}
+
+/* ---- FILTER / SEARCH ---- */
+function setF(f,btn){
+  filter=f;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderAll();
+}
+function doSearch(){srch=document.getElementById('srch').value.toLowerCase();renderAll();}
+function toggleAll(){
+  allOpen=!allOpen;
+  document.querySelectorAll('.sec').forEach(s=>s.classList.toggle('open',allOpen));
+  document.querySelector('.expand-all').textContent=allOpen?'Collapse All':'Expand All';
+}
+
+/* ---- RENDER ---- */
+function renderAll(){
+  const main=document.getElementById('main');
+  main.innerHTML='';
+  let any=false;
+  TOPICS.forEach((tp,ti)=>{
+    const rows=tp.problems.filter(p=>{
+      const match=!srch||p.x.toLowerCase().includes(srch);
+      const isDone=!!ST[p.id];
+      return match&&(filter==='all'||(filter==='done'&&isDone)||(filter==='pending'&&!isDone));
+    });
+    if(!rows.length)return;
+    any=true;
+    const{t,d}=topicTotals(tp);
+    const pct=t?Math.round(d/t*100):0;
+    const r=16,circ=2*Math.PI*r;
+    const offset=circ*(1-pct/100);
+
+    const sec=document.createElement('div');
+    sec.className=`sec ${tp.col}`;
+    sec.setAttribute('data-tp',tp.id);
+    sec.style.animationDelay=(ti*0.035)+'s';
+    if(ti<3||srch)sec.classList.add('open');
+
+    sec.innerHTML=`
+<div class="th" onclick="togTopic('${tp.id}')">
+  <div class="ring-wrap">
+    <svg width="38" height="38" viewBox="0 0 38 38">
+      <circle class="ring-bg" cx="19" cy="19" r="${r}"/>
+      <circle class="ring-fg" id="rfg-${tp.id}" cx="19" cy="19" r="${r}"
+        stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
+      <text x="19" y="23" text-anchor="middle" font-size="12" fill="currentColor" style="color:var(--muted2);font-family:'JetBrains Mono';font-weight:700">${pct}</text>
+    </svg>
+  </div>
+  <div class="ticon" style="font-size:18px">${tp.icon}</div>
+  <div class="tinfo">
+    <div class="ttitle">${tp.title}</div>
+    <div class="tsub">${tp.sub}</div>
+  </div>
+  <div class="tright">
+    <div class="done-badge ${d===t&&t>0?'show':''}" id="badge-${tp.id}"><span>✓</span> Complete</div>
+    <div class="tcnt" id="tcnt-${tp.id}">${d}/${t}</div>
+    <svg class="tchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</div>
+<div class="plist"><div class="plist-border">
+<div class="pinner" id="pi-${tp.id}"></div>
+</div></div>`;
+
+    main.appendChild(sec);
+    const pi=document.getElementById('pi-'+tp.id);
+    rows.forEach(p=>{
+      const done=!!ST[p.id];
+      const tags=(p.t==='hard'?'<span class="tag t-hard">hard</span>':'')+(p.t==='dsa'?'<span class="tag t-dsa">key</span>':'')+(p.t==='rec'?'<span class="tag t-rec">rec</span>':'');
+      const isOriginal=!p.n;
+      const div=document.createElement('div');
+      div.className=`prow${done?' done':''}`;
+      div.onclick=()=>togProb(p.id,tp.id,div);
+      div.innerHTML=`<div class="cb"><svg class="cm" width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="white" stroke-width="2.2"><polyline points="1.5 5.5 4.5 8.5 9.5 2.5"/></svg></div>
+<span class="ptxt">${p.x}<span class="tags">${tags}</span></span>`;
+      pi.appendChild(div);
+    });
+  });
+  if(!any) main.innerHTML='<div class="empty-msg">No problems match your filter.</div>';
+  updateGlobal();
+}
+
+/* ---- RESET ---- */
+function doReset(){
+  if(!confirm('Reset ALL progress?'))return;
+  ST={};save();renderAll();
+  toast('Progress reset to zero.');
+}
+
+/* ---- TOAST ---- */
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+/* ---- CANVAS PARTICLES ---- */
+const canvas=document.getElementById('bg-canvas');
+const ctx=canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;initP()}
+function initP(){
+  particles=[];
+  const count=Math.floor(W*H/18000);
+  for(let i=0;i<count;i++) particles.push(newP());
+}
+function newP(){
+  return{
+    x:Math.random()*W, y:Math.random()*H,
+    vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3,
+    r:Math.random()*1.5+0.5,
+    alpha:Math.random()*0.4+0.1,
+    col:`hsl(${[220,270,190,160][Math.floor(Math.random()*4)]},70%,65%)`
+  };
+}
+function drawP(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{
+    p.x=(p.x+p.vx+W)%W; p.y=(p.y+p.vy+H)%H;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.col;ctx.globalAlpha=p.alpha;ctx.fill();
+  });
+  /* Lines between close particles */
+  ctx.globalAlpha=1;
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<100){
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(79,142,247,${0.06*(1-d/100)})`;
+        ctx.lineWidth=0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+function loop(){drawP();requestAnimationFrame(loop)}
+window.addEventListener('resize',resize);
+resize();loop();
+
+/* ---- INIT ---- */
+load();renderAll();
+</script>
+</body>
+</html>
