@@ -1,0 +1,5 @@
+{
+  "routes": [
+    { "src": "/", "dest": "/c_dsa_tracker.html" }
+  ]
+}
